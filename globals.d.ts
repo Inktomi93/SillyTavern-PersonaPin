@@ -6,5 +6,6 @@ import '../../../../public/global';
 import '../../../../global';
 
 declare global {
-    // Add global type declarations here
+    // Extension-specific type declarations
+    // Note: SillyTavern global types (including jQuery) are already imported above
 }
