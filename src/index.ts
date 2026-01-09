@@ -1,5 +1,3 @@
-import './style.css';
-
 const MODULE_NAME = 'persona-pin';
 const METADATA_KEY = 'pinnedPersona';
 
