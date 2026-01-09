@@ -53,8 +53,11 @@ function init() {
         });
     }
 
-    // Pin persona on chat open
-    ctx.eventSource.on(ctx.eventTypes.CHAT_CHANGED, pinPersona);
+    // Restore any stale backup and pin persona on chat open
+    ctx.eventSource.on(ctx.eventTypes.CHAT_CHANGED, () => {
+        restore(); // Clean up before switching
+        pinPersona();
+    });
 
     // Replace {{user}} before generation
     ctx.eventSource.on(ctx.eventTypes.GENERATION_STARTED, replaceUser);
@@ -90,9 +93,17 @@ function pinPersona() {
 }
 
 function replaceUser() {
-    if (!enabled || backup) return;
+    if (!enabled) return;
 
     const ctx = SillyTavern.getContext();
+
+    // Clear stale backup from different character (race condition: user switched chats mid-generation)
+    if (backup && backup.characterId !== ctx.characterId) {
+        backup = null;
+    }
+
+    if (backup) return; // Already have active backup for this character
+
     const pinned = ctx.chatMetadata?.[METADATA_KEY];
 
     if (!pinned || ctx.characterId === undefined || ctx.characterId < 0) return;
